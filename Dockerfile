@@ -1,16 +1,22 @@
 # ── Build stage ──────────────────────────────────────────────────────────
-FROM python:3.13-alpine AS builder
+FROM python:3.13-slim AS builder
 
-RUN apk add --no-cache gcc musl-dev libffi-dev
+# Update packages to fix potential CVEs
+RUN apt-get update && apt-get upgrade -y && \
+    apt-get install -y --no-install-recommends gcc libc6-dev libffi-dev && \
+    rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
 
 # ── Runtime stage ────────────────────────────────────────────────────────
-FROM python:3.13-alpine
+FROM python:3.13-slim
 
-RUN addgroup -S app && adduser -S -G app app
+# Update packages and create non-root user
+RUN apt-get update && apt-get upgrade -y && \
+    addgroup --system app && adduser --system --group app && \
+    rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /install /usr/local
 

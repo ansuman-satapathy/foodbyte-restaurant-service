@@ -1,6 +1,7 @@
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from jose import jwt, JWTError
+import jwt
+from jwt.exceptions import PyJWTError
 from app.config import settings
 
 bearer_scheme = HTTPBearer(auto_error=True)
@@ -19,7 +20,7 @@ def get_current_user_id(
         if not user_id:
             raise ValueError("Missing sub claim")
         return user_id
-    except (JWTError, ValueError):
+    except (PyJWTError, ValueError):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid or expired token",
