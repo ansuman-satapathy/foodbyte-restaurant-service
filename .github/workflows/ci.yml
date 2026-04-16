@@ -76,6 +76,7 @@ jobs:
           image: ${{ env.IMAGE_NAME }}:${{ github.sha }}
           fail-build: true
           severity-cutoff: critical
+          config-file: .grype.yaml
 
       - name: Upload Scan results to GitHub Security
         uses: github/codeql-action/upload-sarif@v4
