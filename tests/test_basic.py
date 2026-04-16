@@ -10,7 +10,6 @@ from datetime import datetime, timezone
 from unittest.mock import AsyncMock, MagicMock, patch
 from bson import ObjectId
 from httpx import AsyncClient, ASGITransport
-from fastapi.security import HTTPBearer
 
 from app.config import settings
 from app.main import app
