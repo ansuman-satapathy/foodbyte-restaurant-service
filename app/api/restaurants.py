@@ -198,6 +198,38 @@ async def add_menu_item(
     return _doc_to_response(result)
 
 
+@router.patch("/{restaurant_id}/menu/{item_id}", response_model=RestaurantResponse)
+async def update_menu_item(
+    restaurant_id: str,
+    item_id: str,
+    item: MenuItem,
+    user_id: str = Depends(get_current_user_id),
+):
+    db = get_db()
+    try:
+        oid = ObjectId(restaurant_id)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid restaurant ID")
+
+    result = await db.restaurants.find_one_and_update(
+        {"_id": oid, "owner_id": user_id, "menu.item_id": item_id},
+        {"$set": {
+            "menu.$.name": item.name,
+            "menu.$.description": item.description,
+            "menu.$.price": item.price,
+            "menu.$.category": item.category,
+            "menu.$.is_available": item.is_available,
+        }},
+        return_document=True,
+    )
+    if not result:
+        raise HTTPException(
+            status_code=404, detail="Restaurant/Item not found or unauthorized"
+        )
+
+    return _doc_to_response(result)
+
+
 @router.delete("/{restaurant_id}/menu/{item_id}", response_model=RestaurantResponse)
 async def remove_menu_item(
     restaurant_id: str,
