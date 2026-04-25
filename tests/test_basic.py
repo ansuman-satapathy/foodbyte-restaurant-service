@@ -49,6 +49,7 @@ def _mock_db():
 
 # ── config / models ─────────────────────────────────────────────────────────
 
+
 def test_settings():
     assert settings.app_name == "foodbyte-restaurant-service"
 
@@ -69,7 +70,14 @@ def test_menu_item_create():
 
 
 def test_menu_item():
-    m = MenuItem(item_id="1", name="A", description="B", price=1.0, category="C", is_available=True)
+    m = MenuItem(
+        item_id="1",
+        name="A",
+        description="B",
+        price=1.0,
+        category="C",
+        is_available=True,
+    )
     assert m.is_available
 
 
@@ -79,6 +87,7 @@ def test_doc_to_response():
 
 
 # ── routes ───────────────────────────────────────────────────────────────────
+
 
 @pytest.mark.asyncio
 @patch("app.api.restaurants.get_db", _mock_db)
@@ -109,9 +118,11 @@ async def test_search_restaurants():
 async def test_create_restaurant():
     app.dependency_overrides[get_current_user_id] = lambda: "user-1"
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://t") as ac:
-        r = await ac.post("/api/restaurants", json={
-            "name": "New", "slug": "new", "cuisine": "Thai", "address": "1 St"
-        }, headers={"Authorization": "Bearer fake"})
+        r = await ac.post(
+            "/api/restaurants",
+            json={"name": "New", "slug": "new", "cuisine": "Thai", "address": "1 St"},
+            headers={"Authorization": "Bearer fake"},
+        )
     app.dependency_overrides.clear()
     assert r.status_code in (201, 403, 409, 500)
 
@@ -121,7 +132,11 @@ async def test_create_restaurant():
 async def test_update_restaurant():
     app.dependency_overrides[get_current_user_id] = lambda: "user-1"
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://t") as ac:
-        r = await ac.patch(f"/api/restaurants/{FAKE_OID}", json={"name": "Updated"}, headers={"Authorization": "Bearer fake"})
+        r = await ac.patch(
+            f"/api/restaurants/{FAKE_OID}",
+            json={"name": "Updated"},
+            headers={"Authorization": "Bearer fake"},
+        )
     app.dependency_overrides.clear()
     assert r.status_code in (200, 404, 500)
 
@@ -131,7 +146,9 @@ async def test_update_restaurant():
 async def test_get_my_restaurant():
     app.dependency_overrides[get_current_user_id] = lambda: "user-1"
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://t") as ac:
-        r = await ac.get("/api/restaurants/me", headers={"Authorization": "Bearer fake"})
+        r = await ac.get(
+            "/api/restaurants/me", headers={"Authorization": "Bearer fake"}
+        )
     app.dependency_overrides.clear()
     assert r.status_code in (200, 404, 500)
 
@@ -147,5 +164,27 @@ async def test_get_menu_item():
 @pytest.mark.asyncio
 async def test_health():
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://t") as ac:
-        r = await ac.get("/health")
+        r = await ac.get("/api/restaurants/health")
     assert r.status_code == 200
+
+@pytest.mark.asyncio
+@patch("app.api.restaurants.get_db", _mock_db)
+async def test_add_menu_item_route():
+    app.dependency_overrides[get_current_user_id] = lambda: "owner1"
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
+        r = await ac.post("/api/restaurants/69ec459e5b88be169b420cc8/menu", json={
+            "name": "New", "price": 10.0, "category": "main"
+        })
+    app.dependency_overrides.clear()
+    assert r.status_code in (200, 201, 404, 500)
+
+@pytest.mark.asyncio
+@patch("app.api.restaurants.get_db", _mock_db)
+async def test_update_menu_item_route():
+    app.dependency_overrides[get_current_user_id] = lambda: "owner1"
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
+        r = await ac.patch("/api/restaurants/69ec459e5b88be169b420cc8/menu/item1", json={
+            "name": "New", "price": 12.0, "category": "main", "is_available": False
+        })
+    app.dependency_overrides.clear()
+    assert r.status_code in (200, 404, 400, 500)

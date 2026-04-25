@@ -13,7 +13,7 @@ async def init_db() -> None:
     for attempt in range(5):
         try:
             _client = AsyncIOMotorClient(settings.mongodb_url)
-            await _client.admin.command('ping')
+            await _client.admin.command("ping")
             _db = _client[settings.mongodb_db]
             await _ensure_indexes()
             logger.info("MongoDB initialized successfully")

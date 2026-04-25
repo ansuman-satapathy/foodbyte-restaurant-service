@@ -7,17 +7,17 @@ This repository contains the FastAPI application code for the **Restaurant Servi
 
 ## Architecture & Microservices Context
 
-FoodByte is distributed across several completely independent Git repositories. There is no hard link between them at the Git level. Instead, they are orchestrated via a declarative GitOps workflow where the central **Helm Charts Repository** acts as the definitive source of truth (the control plane) for the Kubernetes cluster state.
+FoodByte is distributed across several completely independent Git repositories. There is no hard link between them at the Git level. Instead, they are orchestrated via a declarative GitOps workflow where the central **[Helm Charts Repository](https://github.com/ansuman-satapathy/foodbyte-helm-charts)** acts as the definitive source of truth (the control plane) for the Kubernetes cluster state.
 
 ### Repository Map
 
-- `github.com/yourname/foodbyte-user-service`       ← application code
-- `github.com/yourname/foodbyte-restaurant-service` ← application code (**this repo**)
-- `github.com/yourname/foodbyte-order-service`       ← application code
-- `github.com/yourname/foodbyte-notification-service`← application code
-- `github.com/yourname/foodbyte-frontend`            ← application code
-- `github.com/yourname/foodbyte-helm-charts`         ← **THE control repo** (Flux watches this)
-- `github.com/yourname/foodbyte-infra`               ← Terraform only (Infrastructure definition)
+- `github.com/ansuman-satapathy/foodbyte-user-service`       ← application code
+- `github.com/ansuman-satapathy/foodbyte-restaurant-service` ← application code (**this repo**)
+- `github.com/ansuman-satapathy/foodbyte-order-service`       ← application code
+- `github.com/ansuman-satapathy/foodbyte-notification-service`← application code
+- `github.com/ansuman-satapathy/foodbyte-frontend`            ← application code
+- `github.com/ansuman-satapathy/foodbyte-helm-charts`         ← **THE control repo** (Flux watches this)
+- `github.com/ansuman-satapathy/foodbyte-infra`               ← Infrastructure definition
 
 ## GitOps CI/CD Delivery Flow
 

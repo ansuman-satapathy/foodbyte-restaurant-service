@@ -213,13 +213,15 @@ async def update_menu_item(
 
     result = await db.restaurants.find_one_and_update(
         {"_id": oid, "owner_id": user_id, "menu.item_id": item_id},
-        {"$set": {
-            "menu.$.name": item.name,
-            "menu.$.description": item.description,
-            "menu.$.price": item.price,
-            "menu.$.category": item.category,
-            "menu.$.is_available": item.is_available,
-        }},
+        {
+            "$set": {
+                "menu.$.name": item.name,
+                "menu.$.description": item.description,
+                "menu.$.price": item.price,
+                "menu.$.category": item.category,
+                "menu.$.is_available": item.is_available,
+            }
+        },
         return_document=True,
     )
     if not result:

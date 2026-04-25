@@ -19,9 +19,11 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+
 @app.get("/api/restaurants/health")
 async def health():
     return {"status": "ok", "service": settings.app_name}
+
 
 app.include_router(restaurants.router)
 app.include_router(menu.router)
